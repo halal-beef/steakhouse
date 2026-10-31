@@ -1,0 +1,3 @@
+[submodule "themes/BearCub"]
+	path = themes/BearCub
+	url = https://github.com/clente/hugo-bearcub

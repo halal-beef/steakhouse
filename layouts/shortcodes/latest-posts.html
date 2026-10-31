@@ -1,0 +1,9 @@
+<ul class="blog-posts">
+  {{- range first 5 (where site.RegularPages "Section" "blog") }}
+  <li>
+    <span><i><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (site.Params.dateFormat | default "2006-01-02") }}</time></i></span>
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+  </li>
+  {{- end }}
+</ul>
+<p><a href="{{ (site.GetPage "/blog").RelPermalink }}">All posts →</a></p>
