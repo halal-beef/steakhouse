@@ -186,26 +186,15 @@ Code isn't pretty, but in theory it should work.
 
 SUCCESS! We have successfully managed to boot a modified BL1 from this exploit, seeing this was like a dream come true.
 
-From here, I simply tried booting the rest of the bootchain, to no avail??
-
-It just randomly crashed after sending EPBL, though I had a sneaking suspicion already.
-
-![bad addrs](badaddrs.png)
-![stack](stack.png)
-
-The addresses 0x02039000 and 0x020400000 seemed high enough in iRAM for it to be used by other pieces of firmware and overwrite our payload.
-
-Since I had no idea where to place the payload, I did the next best thing and placed it right after the function pointer table. After doing that and turning off the stack protector (sorry, not sorry), we were now able to load EPBL.
-
-#### EPBL
+#### Booting our own EPBL
 
 #### General information about EPBL
 
-EPBL is the first more serious bit of EL3 firmware run on the device after BL1, as it sets up an initial SMC handler, sets up cores in PMU and prepares for DRAM initialisation; it is encrypted and decrypts itself on boot.
+EPBL is the first more serious bit of EL3 firmware run on the device after BL1, as it sets up an initial SMC handler, sets up cores in PMU and prepares for DRAM initialisation; it is encrypted and decrypts itself on boot. It's also loaded to 0x02026000.
 
 #### Dumping a decrypted EPBL
 
-This was actually very simple; I chose a relatively simple function to hook in BL1 and redirected it back to my payload to be able to do some last-minute patches.
+This was actually somewhat simple; I chose a relatively simple function to hook in BL1 and redirected it back to my payload to be able to do some last-minute patches.
 
 ![hook](hook.png)
 
@@ -213,7 +202,22 @@ The last-minute patch function is fairly simple too.
 
 ![lastminute](callback.png)
 
-It just hooks the USB receive function pointer used by firmware to our payload, just to dump EPBL, as the function is called very late into EPBL, self-decryption is guaranteed to have already happened here. To no one's surprise, the hook worked immaculately and we now had a decrypted EPBL we can look at to plan our patches against.
+It just hooks the USB receive function pointer used by firmware to our payload, just to dump EPBL, as the function is called very late into EPBL, self-decryption is guaranteed to have already happened here. Sadly though, when loading EPBL the device crashed, it definitely was not the hook's fault either as removing it yielded the same result. What the hell?
+
+#### Conflicts
+
+I had a sneaking suspicion on what was crashing the device already.
+
+![bad addrs](badaddrs.png)
+![stack](stack.png)
+
+The addresses 0x02039000 and 0x02040000 seemed high enough in iRAM for it to be used by EPBL and other pieces of firmware, overwriting our payload.
+
+Since I had no idea where to place the payload, I did the next best thing and placed it right after the function pointer table. After doing that and turning off the stack protector (sorry, not sorry), we were now able to load EPBL.
+
+![new addrs](newaddrs.png)
+
+After that debacle, to no one's surprise, the hook worked immaculately and we now had a decrypted EPBL we can look at to plan our patches against.
 
 ![decrypted](decrypted.jpg)
 
