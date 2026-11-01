@@ -225,6 +225,14 @@ A Root-Of-Trust (ROT) is how devices assert secure boot from beginning to end, m
 
 In security research, this type of attack is called a TOCTOU (Time-Of-Check to Time-Of-Use), and in our case, we can take advantage of the fact that we can intercept EPBL execution with hooks and edit images to our liking post-authentication.
 
+#### The bootchain from EPBL onwards
+
+EPBL loads BL2, verifies and authenticates it, after that it jumps to BL2, which does its usual rounds of initialising clocks, DRAM and other hardware, before calling into SMC (EPBL at this point) to continue boot.
+
+EPBL then requests LK and EL3 Monitor to load from USB, authenticates it and jumps into it, completing the boot chain, LK does call into EL3 Monitor to load final trustzone bits but they're non-essential so I will leave them out here.
+
+How does this tie into the TOCTOU I've mentioned? EPBL only checks the current image being loaded, there is nothing stopping us from doing what I mentioned above, loading a valid image, letting it authenticate, and changing it to what we want whilst loading the image after.
+
 After recycling the same hooking logic for dumping a decrypted EPBL, I came up with this.
 
 ![callbackunsignedlk](callbackunsignedlk.png)
