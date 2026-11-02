@@ -1,4 +1,5 @@
 baseURL = 'http://localhost:1313/'
+copyright = 'Umer Uddin'
 locale = 'en-gb'
 title = "Steakhouse"
 theme = 'BearCub'
@@ -13,6 +14,7 @@ enableRobotsTXT = true
 [params]
   description = 'Things I am working on'
   dateFormat = '2006-01-02'
+  madeWith = "you've reached the end!"
   themeStyle = 'original'
   generateSocialCard = false
 
