@@ -3,7 +3,6 @@ copyright = 'Umer Uddin'
 locale = 'en-gb'
 title = "Steakhouse"
 theme = 'BearCub'
-disableKinds = ['rss']
 enableRobotsTXT = true
 
 [markup.highlight]
